@@ -12,35 +12,33 @@
         <div class="col-md-12 mt-3">
             <% if (action != undefined && action == "edit") { %>
                 <div class="alert alert-success">
-                    Blog Güncellendi
+                    Kategori Güncellendi
                 </div>
             <% } %>
             <% if (action != undefined && action == "create") { %>
                 <div class="alert alert-success">
-                    Blog Eklendi
+                    Kategori Eklendi
                 </div>
             <% } %>
             <% if (action != undefined && action == "delete") { %>
                 <div class="alert alert-danger">
-                    Blog Silindi
+                    Kategori Silindi
                 </div>
             <% } %>
             <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th style="width: 150px;">resim</th>
-                        <th>başlık</th>
+                        <th>İsim</th>
                         <th style="width: 130px"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% blogs.forEach(blog => { %>
+                    <% categories.forEach(category => { %>
                     <tr>
-                        <td><img src="/static/images/<%=blog.resim  %>" class="img-fluid" alt=""></td>
-                        <td><%= blog.baslik %></td>
+                        <td><%= category.name %></td>
                         <td>
-                            <a class="btn btn-sm btn-primary" href="/admin/blogs/<%= blog._id %>">Edit</a>
-                            <a class="btn btn-sm btn-danger" href="/admin/blogs/delete/<%= blog._id %>">Delete</a>
+                            <a class="btn btn-sm btn-primary" href="/admin/category/<%= category._id %>">Edit</a>
+                            <a class="btn btn-sm btn-danger" href="/admin/category/delete/<%= category._id %>">Delete</a>
                         </td>
                     </tr>
                     <% }) %>
