@@ -16,6 +16,12 @@
                 <h1 class="h3 mb-3">
                     <%= title %>
                 </h1>
+               
+
+                <% if (blogs.length === 0) { %>
+                    <%- include("../partials/no-product")  %> 
+                 
+                <% } %>
 
                 <% blogs.forEach(blog => { %>
 

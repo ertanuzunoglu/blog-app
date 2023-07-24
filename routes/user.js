@@ -1,55 +1,88 @@
 const express = require("express");
 const router = express.Router();
+const Blog = require("../models/blog");
+const Category = require("../models/category");
 
-const data = {
-    title: "Popüler Kurslar",
-    categories: ["Web Geliştirme", "Programlama", "Mobil Uygulamalar", "Veri Analizi", "Ofis Uygulamaları"],
-    blogs: [
-        {
-            blogid: 1,
-            baslik: "Komple Uygulamalı Web Geliştirme",
-            aciklama: "Sıfırdan ileri seviyeye 'Web Geliştirme': Html, Css, Sass, Flexbox, Bootstrap, Javascript, Angular, JQuery, Asp.Net Mvc&Core Mvc",
-            resim: "1.jpeg",
-            anasayfa: true,
-            onay: true
-        },
-        {
-            blogid: 2,
-            baslik: "Python ile Sıfırdan İleri Seviye Python Programlama",
-            aciklama: "Sıfırdan İleri Seviye Python Dersleri.Veritabanı,Veri Analizi,Bot Yazımı,Web Geliştirme(Django)",
-            resim: "2.jpeg",
-            anasayfa: true,
-            onay: false
-        },
-        {
-            blogid: 3,
-            baslik: "Sıfırdan İleri Seviye Modern Javascript Dersleri ES7+",
-            aciklama: "Modern javascript dersleri ile (ES6 & ES7+) Nodejs, Angular, React ve VueJs için sağlam bir temel oluşturun.",
-            resim: "3.jpeg",
-            anasayfa: false,
-            onay: true
-        },
-        {
-            blogid: 3,
-            baslik: "Sıfırdan İleri Seviye Modern Javascript Dersleri ES7+",
-            aciklama: "Modern javascript dersleri ile (ES6 & ES7+) Nodejs, Angular, React ve VueJs için sağlam bir temel oluşturun.",
-            resim: "3.jpeg",
-            anasayfa: false,
-            onay: true
-        },
-    ]
-}
+router.get("/blogs/category/:categoryid", async function (req, res) {
+	const id = req.params.categoryid
+	try {
+		const blogs = await Blog.find({category_id:id}).lean();
+		const categories = await Category.find().lean();
 
-router.use("/blogs/:blogid", function(req, res) {
-    res.render("users/blog-details");
+		res.status(200).render("users/blogs", {
+			title: "Kurslar",
+			categories: categories,
+			blogs: blogs,
+			selectedCategory: id
+		});
+
+	} catch (error) {
+		console.log(error);
+		res.status(400).json({
+			status: "fail",
+			error,
+		});
+	}
 });
 
-router.use("/blogs", function(req, res) {
-    res.render("users/blogs", data);
+router.get("/blogs/:blogid", async function (req, res) {
+	const id = req.params.blogid;
+	try {
+		const blog = await Blog.findOne({ _id: id });
+		res.render("users/blog-details", {
+			title: blog.baslik,
+			blog: blog,
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(400).json({
+			status: "fail",
+			error,
+		});
+	}
 });
 
-router.use("/", function(req, res) {
-    res.render("users/index", data);
+router.get("/blogs", async function (req, res) {
+	try {
+		const blogs = await Blog.find({ onay: true }).lean();
+		const categories = await Category.find().lean();
+
+		res.render("users/blogs", {
+			title: "Tüm Kurslar",
+			categories: categories,
+			blogs: blogs,
+			selectedCategory: null
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(400).json({
+			status: "fail",
+			error,
+		});
+	}
 });
+
+router.get("/", async function (req, res) {
+	try {
+		const blogs = await Blog.find({ anasayfa: true, onay: true }).lean();
+		const categories = await Category.find().lean();
+
+		res.status(200).render("users/index", {
+			title: "Popüler Kurslar",
+			categories: categories,
+			blogs: blogs,
+			selectedCategory: null
+
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(400).json({
+			status: "fail",
+			error,
+		});
+	}
+});
+
+
 
 module.exports = router;

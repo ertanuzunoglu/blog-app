@@ -1,13 +1,12 @@
 const mongoose = require ("mongoose")
 const dotenv = require("dotenv")
-dotenv.config();
 
 const DB_PASSWORD = process.env.DB_PASSWORD;
 
 const connectMongo = async () => {
 	try {
 		await mongoose.connect(
-			`mongodb+srv://ertanuzunogl:${DB_PASSWORD}@cluster0.almcin3.mongodb.net/`,
+			`mongodb+srv://ertanuzunoglu:${DB_PASSWORD}@cluster0.iucg0ka.mongodb.net/`,
 			{
 				useNewUrlParser: true,
 				useUnifiedTopology: true,
@@ -19,4 +18,4 @@ const connectMongo = async () => {
 	}
 };
 
-export default connectMongo;
+module.exports = connectMongo;
