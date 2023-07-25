@@ -12,7 +12,7 @@
         <div class="container mt-3">
             <div class="row">
                 <div class="col-md-12 mt-3">
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         <div class="row mb-3">
                             <label for="baslik" class="col-sm-2 col-form-label">Başlık</label>
                             <div class="col-sm-8">
@@ -20,15 +20,22 @@
                             </div>
                         </div>
                         <div class="row mb-3">
+                            <label for="altbaslik" class="col-sm-2 col-form-label">Alt Başlık</label>
+                            <div class="col-sm-8">
+                                <textarea name="altbaslik" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
                             <label for="aciklama" class="col-sm-2 col-form-label">Açıklama</label>
                             <div class="col-sm-8">
-                                <textarea name="aciklama" class="form-control" rows="10"></textarea>
+                                <textarea id="editor" name="aciklama" class="form-control" rows="10"></textarea>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label for="resim" class="col-sm-2 col-form-label">Resim</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="resim" name="resim">
+                                <img id="resimOnizleme" src="" alt="Resim önizleme" style="display: none;" width="150px">
+                                <input type="file" class="form-control" id="resim" name="resim" accept="image/*" onchange="previewImage(event)">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -71,5 +78,32 @@
                 </div>
             </div>
         </div>
+    <script>
+        function previewImage(event) {
+            const fileInput = event.target;
+            const imagePreview = document.getElementById('resimOnizleme');
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'inline'; // Resim yüklendiyse göster
+                };
+
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                imagePreview.src = "";
+                imagePreview.style.display = 'none'; // Resim yüklenmediyse gizle
+            }
+        }
+
+        ClassicEditor
+            .create( document.querySelector( '#editor' ) )
+            .catch( error => {
+                console.error( error );
+            } );
+
+    </script>
     </body>
 </html>

@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const blogSchema = new Schema({
     baslik: String,
+    altbaslik: String,
     aciklama: String,
     resim: String,
     anasayfa: {

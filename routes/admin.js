@@ -1,8 +1,9 @@
 const express = require("express");
+const imageUpload = require("../helper/image-upload");
+const fs = require("fs");
 const router = express.Router();
 const Blog = require("../models/blog");
 const Category = require("../models/category");
-
 
 router.get("/blogs", async function (req, res) {
 	try {
@@ -28,25 +29,34 @@ router.get("/blog/create", async function (req, res) {
 	} catch (error) {}
 });
 
-router.post("/blog/create", async function (req, res) {
-	const baslik = req.body.baslik;
-	const aciklama = req.body.aciklama;
-	const resim = req.body.resim;
-	const anasayfa = req.body.anasayfa == "on" ? true : false;
-	const onay = req.body.onay == "on" ? true : false;
-	try {
-		await Blog.create({
-			baslik: baslik,
-			aciklama: aciklama,
-			resim: resim,
-			anasayfa: anasayfa,
-			onay: onay,
-		});
-		res.redirect("/admin/blogs?action=create");
-	} catch (error) {
-		console.log(error);
+router.post(
+	"/blog/create",
+	imageUpload.upload.single("resim"),
+	async function (req, res) {
+		const baslik = req.body.baslik;
+		const altbaslik = req.body.altbaslik
+		const aciklama = req.body.aciklama;
+		const resim = req.file.filename;
+		const anasayfa = req.body.anasayfa == "on" ? true : false;
+		const onay = req.body.onay == "on" ? true : false;
+		const category_id = req.body.kategori;
+		try {
+			console.log(resim);
+			await Blog.create({
+				baslik: baslik,
+				altbaslik : altbaslik,
+				aciklama: aciklama,
+				resim: resim,
+				anasayfa: anasayfa,
+				onay: onay,
+				category_id: category_id,
+			});
+			res.redirect("/admin/blogs?action=create");
+		} catch (error) {
+			console.log(error);
+		}
 	}
-});
+);
 
 router.get("/blog/:blogid", async function (req, res) {
 	const id = req.params.blogid;
@@ -60,25 +70,40 @@ router.get("/blog/:blogid", async function (req, res) {
 	});
 });
 
-router.post("/blog/:blogid", async function (req, res) {
-	const id = req.params.blogid;
-	console.log(req.body);
-	const update = {
-		baslik: req.body.baslik,
-		aciklama: req.body.aciklama,
-		resim: req.body.resim,
-		anasayfa: req.body.anasayfa == "on" ? true : false,
-		onay: req.body.onay == "on" ? true : false,
-		category_id: req.body.kategori,
-	};
+router.post(
+	"/blog/:blogid",
+	imageUpload.upload.single("resim"),
+	async function (req, res) {
+		const id = req.params.blogid;
+		let image = "";
+		if (req.file) {
+			image = req.file.filename;
+			fs.unlink("./public/images/" + req.body.resim, (err) => {
+				if (err) {
+					console.log("Dosya silinirken bir hata oluştu:", err);
+				}
+			});
+		} else {
+			image = req.body.resim;
+		}
+		const update = {
+			baslik: req.body.baslik,
+			altbaslik: req.body.altbaslik,
+			aciklama: req.body.aciklama,
+			resim: image,
+			anasayfa: req.body.anasayfa == "on" ? true : false,
+			onay: req.body.onay == "on" ? true : false,
+			category_id: req.body.kategori,
+		};
 
-	try {
-		await Blog.findOneAndUpdate({ _id: id }, update);
-		res.redirect("/admin/blogs?action=edit");
-	} catch (error) {
-		console.log(error);
+		try {
+			await Blog.findOneAndUpdate({ _id: id }, update);
+			res.redirect("/admin/blogs?action=edit");
+		} catch (error) {
+			console.log(error);
+		}
 	}
-});
+);
 
 router.get("/blog/delete/:blogid", async function (req, res) {
 	const id = req.params.blogid;
